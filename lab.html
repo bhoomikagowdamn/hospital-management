@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab Tests - CityCare Hospital</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="lab-page">
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <h2>🏥 CityCare Hospital</h2>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="appointments.html">Appointments</a>
+      <a href="departments.html">Departments</a>
+      <a href="pharmacy.html">Pharmacy</a>
+      <a href="lab.html" class="active">Lab</a>
+      <a href="billing.html">Billing</a>
+      <a href="chatbot.html">AI Chatbot</a>
+      <a href="emergency.html" class="emergency-btn">🚨 Emergency</a>
+      <a href="index.html">Logout</a>
+    </nav>
+  </header>
+
+  <main class="lab">
+    <h1>🧪 Diagnostic Lab</h1>
+    <p class="subtitle">Book your lab tests online</p>
+
+    <!-- Search -->
+    <input type="text" id="labSearch" placeholder="🔍 Search lab tests..." class="search-bar">
+
+    <!-- Tests Grid -->
+    <div class="test-grid" id="testGrid"></div>
+
+    <!-- Cart -->
+    <section class="cart">
+      <h2>🛒 Selected Tests</h2>
+      <ul id="labCartList"></ul>
+      <p><strong>Total: ₹<span id="labCartTotal">0</span></strong></p>
+      <button class="glow-btn" onclick="checkoutLab()">Checkout → Billing</button>
+    </section>
+  </main>
+
+  <script>
+    const tests = [
+      {test:"Blood Test", price:300, img:"img/lab/blood.jpg", desc:"Complete blood count for general health."},
+      {test:"X-Ray", price:500, img:"img/lab/xray.jpg", desc:"Imaging for bones and chest."},
+      {test:"MRI Scan", price:2500, img:"img/lab/mri.jpg", desc:"Detailed scan of soft tissues & brain."},
+      {test:"ECG", price:400, img:"img/lab/ecg.jpg", desc:"Measures electrical activity of heart."},
+      {test:"Urine Test", price:200, img:"img/lab/urine.jpg", desc:"Checks kidney & urinary tract health."},
+      {test:"Thyroid Test", price:450, img:"img/lab/thyroid.jpg", desc:"Checks thyroid hormone levels."},
+      {test:"Liver Function Test", price:550, img:"img/lab/liver.jpg", desc:"Evaluates liver enzymes & function."},
+      {test:"CT Scan", price:2000, img:"img/lab/ct.jpg", desc:"Cross-sectional body imaging."},
+      {test:"Vitamin B12 Test", price:350, img:"img/lab/vitb12.jpg", desc:"Detects B12 deficiency for energy & nerves."}
+    ];
+
+    const testGrid = document.getElementById("testGrid");
+    const labCartList = document.getElementById("labCartList");
+    const labCartTotal = document.getElementById("labCartTotal");
+
+    let labCart = [];
+
+    function renderTests(list) {
+      testGrid.innerHTML = "";
+      list.forEach(t => {
+        const card = document.createElement("div");
+        card.className = "test-card";
+        card.innerHTML = `
+          <img src="${t.img}" alt="${t.test}">
+          <h3>${t.test}</h3>
+          <p>${t.desc}</p>
+          <p class="price">₹${t.price}</p>
+          <button onclick="addLabCart('${t.test}', ${t.price}, '${t.img}', '${t.desc}')">Add</button>
+        `;
+        testGrid.appendChild(card);
+      });
+    }
+    renderTests(tests);
+
+    function addLabCart(test, price, img, desc) {
+      labCart.push({test, price, img, desc});
+      updateLabCart();
+    }
+
+    function updateLabCart() {
+      labCartList.innerHTML = "";
+      let total = 0;
+      labCart.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.test} - ₹${item.price}`;
+        labCartList.appendChild(li);
+        total += item.price;
+      });
+      labCartTotal.textContent = total;
+    }
+
+    function checkoutLab() {
+      localStorage.setItem("labCart", JSON.stringify(labCart));
+      alert("✅ Lab tests added to billing!");
+      window.location.href = "billing.html";
+    }
+
+    // Search functionality
+    document.getElementById("labSearch").addEventListener("keyup", function() {
+      const query = this.value.toLowerCase();
+      const filtered = tests.filter(t => t.test.toLowerCase().includes(query));
+      renderTests(filtered);
+    });
+  </script>
+</body>
+</html>
