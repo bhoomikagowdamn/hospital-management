@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hospital Management - Login</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-page"
+style="margin: 0;
+padding: 0;
+background: url('img/background.jpg') no-repeat center center fixed;
+  background-size: cover;">
+
+  <div class="login-container">
+    <img src="img/logo.png" alt="Hospital Logo" class="logo">
+
+    <h1 class="hospital-name">🏥 CityCare Hospital</h1>
+    <p class="tagline">Your Health, Our Priority</p>
+
+    <form id="login-form">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+
+      <button type="submit">Login</button>
+    </form>
+
+    <div class="login-links">
+      <a href="#">New Patient? Register</a> |
+      <a href="#">Forgot Password?</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("login-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+
+      if (user === "admin" && pass === "admin123") {
+        window.location.href = "admin.html";  // Admin login
+      } else {
+        window.location.href = "dashboard.html";  // Patient login
+      }
+    });
+  </script>
+
+</body>
+</html>
