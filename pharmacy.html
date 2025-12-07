@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pharmacy - CityCare Hospital</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="pharmacy-page">
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <h2>🏥 CityCare Hospital</h2>
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="appointments.html">Appointments</a>
+      <a href="departments.html">Departments</a>
+      <a href="pharmacy.html" class="active">Pharmacy</a>
+      <a href="lab.html">Lab</a>
+      <a href="billing.html">Billing</a>
+      <a href="chatbot.html">AI Chatbot</a>
+      <a href="emergency.html" class="emergency-btn">🚨 Emergency</a>
+      <a href="index.html">Logout</a>
+    </nav>
+  </header>
+
+  <main class="pharmacy">
+    <h1>💊 Pharmacy</h1>
+    <p class="subtitle">Browse and order medicines</p>
+
+    <!-- Search -->
+    <input type="text" id="searchBar" placeholder="🔍 Search medicines..." class="search-bar">
+
+    <!-- Medicine Grid -->
+    <div class="medicine-grid" id="medicineGrid"></div>
+
+    <!-- Cart -->
+    <section class="cart">
+      <h2>🛒 Your Cart</h2>
+      <ul id="cartList"></ul>
+      <p><strong>Total: ₹<span id="cartTotal">0</span></strong></p>
+      <button class="glow-btn" onclick="checkout()">Checkout → Billing</button>
+    </section>
+  </main>
+
+  <script>
+    const medicines = [
+      {name:"Paracetamol", price:25, img:"img/medicines/paracetamol.jpg", desc:"Used for fever and mild pain relief."},
+      {name:"Augmentin", price:120, img:"img/medicines/augmentin.jpg", desc:"Antibiotic for bacterial infections."},
+      {name:"Insulin", price:350, img:"img/medicines/insulin.jpg", desc:"Essential for diabetes management."},
+      {name:"Vitamin D", price:50, img:"img/medicines/vitamin-d.jpg", desc:"Supports bone and immune health."},
+      {name:"Amoxicillin", price:80, img:"img/medicines/amoxicillin.jpg", desc:"Broad-spectrum antibiotic."},
+      {name:"Cough Syrup", price:90, img:"img/medicines/cough-syrup.jpg", desc:"Relieves cough and throat irritation."},
+      {name:"Aspirin", price:40, img:"img/medicines/aspirin.jpg", desc:"Pain reliever, reduces fever & inflammation."},
+      {name:"Cetirizine", price:30, img:"img/medicines/cetirizine.jpg", desc:"Allergy relief (sneezing, runny nose)."},
+      {name:"Metformin", price:200, img:"img/medicines/metformin.jpg", desc:"Controls blood sugar in type 2 diabetes."},
+      {name:"Pantoprazole", price:150, img:"img/medicines/pantoprazole.jpg", desc:"Reduces stomach acid & heartburn."},
+      {name:"Calcium Tablets", price:110, img:"img/medicines/calcium.jpg", desc:"Strengthens bones & teeth."},
+      {name:"ORS Solution", price:20, img:"img/medicines/ors.jpg", desc:"Restores hydration during diarrhea/fever."}
+    ];
+
+    const grid = document.getElementById("medicineGrid");
+    const cartList = document.getElementById("cartList");
+    const cartTotal = document.getElementById("cartTotal");
+
+    let cart = [];
+
+    // Render Medicines
+    function renderMedicines(list) {
+      grid.innerHTML = "";
+      list.forEach(med => {
+        const card = document.createElement("div");
+        card.className = "medicine-card";
+        card.innerHTML = `
+          <img src="${med.img}" alt="${med.name}">
+          <h3>${med.name}</h3>
+          <p>${med.desc}</p>
+          <p class="price">₹${med.price}</p>
+          <button onclick="addToCart('${med.name}', ${med.price})">Add to Cart</button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+    renderMedicines(medicines);
+
+    // Add to Cart
+    function addToCart(name, price) {
+      cart.push({name, price});
+      updateCart();
+    }
+
+    // Update Cart
+    function updateCart() {
+      cartList.innerHTML = "";
+      let total = 0;
+      cart.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} - ₹${item.price}`;
+        cartList.appendChild(li);
+        total += item.price;
+      });
+      cartTotal.textContent = total;
+    }
+
+    // Checkout → Save in localStorage
+    function checkout() {
+      localStorage.setItem("pharmacyCart", JSON.stringify(cart));
+      alert("✅ Items added to billing!");
+      window.location.href = "billing.html";
+    }
+
+    // Search
+    document.getElementById("searchBar").addEventListener("keyup", function() {
+      const query = this.value.toLowerCase();
+      const filtered = medicines.filter(med => med.name.toLowerCase().includes(query));
+      renderMedicines(filtered);
+    });
+  </script>
+</body>
+</html>
