@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billing - CityCare Hospital</title>
+  <style>
+    /* ====== General Theme ====== */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f9ff;
+      color: #222;
+    }
+    .navbar {
+      background: #0066cc;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navbar h2 { margin: 0; }
+    .navbar nav a {
+      color: white;
+      margin: 0 10px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .navbar nav a.active, .navbar nav a:hover {
+      text-decoration: underline;
+    }
+    .emergency-btn {
+      background: red;
+      padding: 4px 8px;
+      border-radius: 5px;
+      color: white !important;
+    }
+
+    /* ====== Billing Page ====== */
+    .billing-container {
+      max-width: 900px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .billing-container h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .bill-section {
+      margin-bottom: 20px;
+    }
+    .bill-section h2 {
+      background: #0066cc;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+    }
+    .bill-card {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      background: #f0f8ff;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .bill-card img {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    .bill-card h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #004080;
+    }
+    .bill-card p {
+      margin: 2px 0;
+      font-size: 14px;
+    }
+    .subtotal {
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    .grand-total {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .grand-total h2 {
+      color: #006600;
+    }
+    .glow-btn, .clear-btn {
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 0 10px rgba(0,114,255,0.6);
+      transition: 0.3s;
+    }
+    .clear-btn {
+      background: linear-gradient(90deg, #ff5f6d, #ff3c3c);
+      box-shadow: 0 0 10px rgba(255,60,60,0.6);
+    }
+    .glow-btn:hover, .clear-btn:hover {
+      transform: scale(1.05);
+    }
+    .back-dashboard-btn {
+      display: block;
+      text-align: center;
+      margin: 20px auto;
+      text-decoration: none;
+      background: #0066cc;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body class="billing-page">
+
+  <header class="navbar">
+    <h2>🏥 CityCare Hospital</h2>
+    <nav>
+      <a href="appointments.html">Appointments</a>
+      <a href="departments.html">Departments</a>
+      <a href="pharmacy.html">Pharmacy</a>
+      <a href="lab.html">Lab</a>
+      <a href="billing.html" class="active">Billing</a>
+      <a href="chatbot.html">AI Chatbot</a>
+      <a href="emergency.html" class="emergency-btn">🚨 Emergency</a>
+      <a href="index.html">Logout</a>
+    </nav>
+  </header>
+
+  <main class="billing-container">
+    <h1>💳 Patient Billing</h1>
+
+    <!-- Pharmacy -->
+    <section class="bill-section">
+      <h2>💊 Pharmacy</h2>
+      <div id="pharmacyBill"></div>
+      <p class="subtotal">Subtotal: ₹<span id="pharmacyTotal">0</span></p>
+    </section>
+
+    <!-- Lab Tests -->
+    <section class="bill-section">
+      <h2>🧪 Lab Tests</h2>
+      <div id="labBill"></div>
+      <p class="subtotal">Subtotal: ₹<span id="labTotal">0</span></p>
+    </section>
+
+    <!-- Grand Total -->
+    <section class="grand-total">
+      <h2>🧾 Grand Total: ₹<span id="grandTotal">0</span></h2>
+      <button class="glow-btn" onclick="downloadBill()">⬇ Download PDF Bill</button>
+      <button onclick="clearBills()" class="clear-btn">🗑 Clear All Bills</button>
+    </section>
+  </main>
+  <a href="dashboard.html" class="back-dashboard-btn">⬅ Back to Dashboard</a>
+
+  <script>
+    function addBillItem(containerId, item, type) {
+      const container = document.getElementById(containerId);
+      const card = document.createElement("div");
+      card.classList.add("bill-card");
+
+      // Handle different object keys
+      let title = item.name || item.test || "Service";
+      let desc = item.desc || "";
+      let img = item.img || "img/default.jpg";
+
+      card.innerHTML = `
+        <img src="${img}" alt="${title}">
+        <div>
+          <h3>${title}</h3>
+          <p>${desc}</p>
+          <p class="price">₹${item.price}</p>
+        </div>
+      `;
+
+      container.appendChild(card);
+    }
+
+    let pharmacyTotal = 0, labTotal = 0;
+
+    // Pharmacy
+    const pharmacyBill = JSON.parse(localStorage.getItem("pharmacyCart")) || [];
+    pharmacyBill.forEach(item => {
+      addBillItem("pharmacyBill", item, "pharmacy");
+      pharmacyTotal += item.price;
+    });
+    document.getElementById("pharmacyTotal").innerText = pharmacyTotal;
+
+    // Lab
+    const labBill = JSON.parse(localStorage.getItem("labCart")) || [];
+    labBill.forEach(item => {
+      addBillItem("labBill", item, "lab");
+      labTotal += item.price;
+    });
+    document.getElementById("labTotal").innerText = labTotal;
+
+    // Grand Total
+    const grandTotal = pharmacyTotal + labTotal;
+    document.getElementById("grandTotal").innerText = grandTotal;
+
+    // Download Bill (demo)
+    function downloadBill() {
+      alert("PDF Bill download feature will be added here (jsPDF or backend).");
+    }
+
+    // Clear All
+    function clearBills() {
+      if (confirm("Are you sure you want to clear all bills?")) {
+        localStorage.removeItem("pharmacyCart");
+        localStorage.removeItem("labCart");
+        alert("✅ All bills cleared!");
+        location.reload();
+      }
+    }
+  </script>
+</body>
+</html>
